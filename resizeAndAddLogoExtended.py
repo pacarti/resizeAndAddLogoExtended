@@ -1,8 +1,18 @@
 #! python3
 # resizeAndAddLogoExtended.py - Resizes all images in current working directory to fit in a 300x300 square, and adds catlogo.png to the lower-right corner.
 
-import os
+import os, re
 from PIL import Image
+
+# Returns true if image file extension is valid(case insensitive for .png, ,jpg, .bmp and .gif formats):
+def isFilenameExtValid(imageFileName):
+    PNGsuffixRegex = re.compile(r'.+(\.png$){1}', re.I)
+    JPGsuffixRegex = re.compile(r'.+(\.jpg$){1}', re.I)
+    BMPsuffixRegex = re.compile(r'.+(\.bmp$){1}', re.I)
+    GIFsuffixRegex = re.compile(r'.+(\.gif$){1}', re.I)
+    # ^ and $ used so that entire string is matched from the beginning to the end.
+    if PNGsuffixRegex.match(imageFileName) or JPGsuffixRegex.match(imageFileName) or BMPsuffixRegex.match(imageFileName) or GIFsuffixRegex.match(imageFileName):
+        return True
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -11,10 +21,12 @@ LOGO_FILENAME = 'catlogo.png'
 logoIm = Image.open(LOGO_FILENAME)
 logoWidth, logoHeight = logoIm.size
 
+
 os.makedirs('withLogo', exist_ok=True)
 # Loop over all files in the working directory.
 for filename in os.listdir('.'):
-    if not (filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.gif') or filename.endswith('.bmp') or filename.endswith('.PNG') or filename.endswith('.JPG') or filename.endswith('.GIF') or filename.endswith('.BMP')) or filename == LOGO_FILENAME:
+    # if not (filename.endswith('.png') or filename.endswith('.jpg') or filename.endswith('.gif') or filename.endswith('.bmp') or filename.endswith('.PNG') or filename.endswith('.JPG') or filename.endswith('.GIF') or filename.endswith('.BMP')) or filename == LOGO_FILENAME:
+    if not isFilenameExtValid(filename):
         continue    # skip non-image files and the logo file itself
     im = Image.open(filename)
     width, height = im.size
